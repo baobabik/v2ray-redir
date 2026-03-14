@@ -2,36 +2,67 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Redirecting...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Перенаправление...</title>
     <style>
-        body { background: #1a1a1a; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; }
-        .loader { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #248bcf; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        body { 
+            background: #1a1a1a; color: #fff; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            height: 100vh; margin: 0; font-family: -apple-system, sans-serif;
+            text-align: center; padding: 20px;
+        }
+        .loader { 
+            border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #248bcf; 
+            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; 
+            margin-bottom: 20px;
+        }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .hint-container { display: none; flex-direction: column; align-items: center; }
+        
+        /* Стили для большой ссылки-кнопки */
+        .manual-link { 
+            display: inline-block; margin-top: 15px; padding: 15px 25px; 
+            background: #248bcf; color: white; text-decoration: none; 
+            border-radius: 12px; font-size: 20px; font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .text-desc { font-size: 18px; color: #ccc; line-height: 1.4; }
     </style>
 </head>
 <body>
-    <div class="loader"></div>
+    <div id="loading" class="loader"></div>
+    
+    <div id="hint" class="hint-container">
+        <div class="text-desc">Если приложение не открылось автоматически:</div>
+        <a id="btn" href="#" class="manual-link">ОТКРЫТЬ V2RAYTUN</a>
+        <p style="color: #666; font-size: 14px; margin-top: 20px;">Или скопируйте ссылку вручную из бота</p>
+    </div>
+
     <script>
-        // Получаем конфиг из URL (?config=vless://...)
         const urlParams = new URLSearchParams(window.location.search);
         const config = urlParams.get('config');
 
         if (config) {
-            // Формируем прямую ссылку для v2raytun
             const appLink = "v2raytun://import/" + config;
-            
-            // Пытаемся открыть приложение
+            const btn = document.getElementById('btn');
+            btn.href = appLink;
+
+            // 1. Пытаемся открыть сразу
             window.location.href = appLink;
 
-            // Запасной вариант через 500мс (если первый заблокирован)
+            // 2. Показываем крупную кнопку через 2 секунды, если редирект не сработал
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('hint').style.display = 'flex';
+            }, 2000);
+            
+            // 3. Запасная попытка через обычный vless протокол
             setTimeout(() => {
                 window.location.href = config;
             }, 500);
-
-            // Если через 5 секунд пользователь все еще тут — выводим подсказку
-            setTimeout(() => {
-                document.body.innerHTML = '<div style="text-align:center">Если приложение не открылось, <a href="' + appLink + '" style="color:#248bcf">нажмите сюда</a></div>';
-            }, 5000);
+        } else {
+            document.body.innerHTML = "Ошибка: Конфигурация не найдена.";
         }
     </script>
 </body>
