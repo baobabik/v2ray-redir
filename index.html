@@ -2,44 +2,37 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://telegram.org"></script>
+    <title>Redirecting...</title>
     <style>
-        body { background: #1a1a1a; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: sans-serif; }
-        .btn { background: #248bcf; color: white; border: none; padding: 15px 30px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        body { background: #1a1a1a; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; }
+        .loader { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #248bcf; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <button class="btn" id="go">ПОДКЛЮЧИТЬ</button>
-
+    <div class="loader"></div>
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.ready();
+        // Получаем конфиг из URL (?config=vless://...)
+        const urlParams = new URLSearchParams(window.location.search);
+        const config = urlParams.get('config');
 
-        document.getElementById('go').onclick = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const config = urlParams.get('config');
+        if (config) {
+            // Формируем прямую ссылку для v2raytun
+            const appLink = "v2raytun://import/" + config;
             
-            if (config) {
-                // Пытаемся открыть через специальный протокол v2raytun
-                const fullLink = "v2raytun://import/" + config;
+            // Пытаемся открыть приложение
+            window.location.href = appLink;
 
-                // Способ 1: Метод Telegram (самый приоритетный)
-                tg.openLink(fullLink);
+            // Запасной вариант через 500мс (если первый заблокирован)
+            setTimeout(() => {
+                window.location.href = config;
+            }, 500);
 
-                // Способ 2: Прямой переход через location
-                window.location.href = fullLink;
-
-                // Способ 3: Создание невидимой ссылки
-                const a = document.createElement('a');
-                a.href = fullLink;
-                document.body.appendChild(a);
-                a.click();
-
-                // Закрываем Mini App через 2 секунды
-                setTimeout(() => { tg.close(); }, 2000);
-            }
-        };
+            // Если через 5 секунд пользователь все еще тут — выводим подсказку
+            setTimeout(() => {
+                document.body.innerHTML = '<div style="text-align:center">Если приложение не открылось, <a href="' + appLink + '" style="color:#248bcf">нажмите сюда</a></div>';
+            }, 5000);
+        }
     </script>
 </body>
 </html>
