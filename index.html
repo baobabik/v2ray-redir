@@ -38,31 +38,32 @@
         <a id="btn" href="#" class="manual-link">ОТКРЫТЬ V2RAYTUN</a>
         <p style="color: #666; font-size: 14px; margin-top: 20px;">Или скопируйте ссылку вручную из бота</p>
     </div>
-
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const config = urlParams.get('config');
+    const urlParams = new URLSearchParams(window.location.search);
+    const config = urlParams.get('config');
 
-        if (config) {
-            const appLink = "v2raytun://import/" + config;
-            const btn = document.getElementById('btn');
-            btn.href = appLink;
+    if (config) {
+         const isDesktop = !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+          
+        document.getElementById('mainBtn').onclick = function() {
+            if (isDesktop) {
+                // Ссылка для десктопных Hiddify / Happ
+                const desktopLink = "hiddify://import/" + config;
+                window.location.href = desktopLink;
+            } else {
+                // Ссылка для мобильного v2raytun
+                const mobileLink = "v2raytun://import/" + config;
+                window.location.href = mobileLink;
+            }
 
-            // 1. Пытаемся открыть сразу
-            window.location.href = appLink;
-
-            // 2. Показываем крупную кнопку через 2 секунды, если редирект не сработал
             setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('hint').style.display = 'flex';
             }, 2000);
             
-            // 3. Запасная попытка через обычный vless протокол
-            setTimeout(() => {
-                window.location.href = config;
-            }, 500);
-        } else {
-            document.body.innerHTML = "Ошибка: Конфигурация не найдена.";
+            // Фоллбэк: пробуем открыть чистый vless через 1 сек
+            setTimeout(() => { window.location.href = config; }, 1000);
+            };
         }
     </script>
 </body>
