@@ -47,7 +47,7 @@
         const button = document.getElementById('btn'); // Исправлено: берем правильный ID
 
         // Формируем нужную ссылку
-        const appLink = isDesktop ? "hiddify://install-proxy?url=" + safeConfig : "v2raytun://import/" + config;
+        const appLink = isDesktop ? "hiddify://install-config?url=" + safeConfig : "v2raytun://import/" + config;
         
         // Сразу привязываем ссылку к кнопке
         button.href = appLink;
