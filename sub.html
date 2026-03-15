@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Subscription</title></head>
+<body style="background:#1a1a1a; color:white; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-family:sans-serif;">
+    <div id="ui">
+        <a id="btn" href="#" style="padding:15px 30px; background:#248bcf; color:white; border-radius:12px; text-decoration:none; font-weight:bold; font-size:20px;">ИМПОРТ В HIDDIFY</a>
+    </div>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const b64 = urlParams.get('config');
+        if (b64) {
+            const config = atob(b64);
+            // Если запрос от приложения — отдаем чистый конфиг
+            if (navigator.userAgent.includes("Hiddify") || navigator.userAgent.includes("Go-http-client")) {
+                document.body.innerText = config;
+            } else {
+                // Если от человека — формируем ссылку на импорт ЭТОЙ же страницы
+                const currentUrl = window.location.href;
+                document.getElementById('btn').href = "hiddify://import/" + encodeURIComponent(currentUrl);
+            }
+        }
+    </script>
+</body>
+</html>
