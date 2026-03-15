@@ -41,13 +41,13 @@
     <script>
     const urlParams = new URLSearchParams(window.location.search);
     const config = urlParams.get('config');
-
+    const safeConfig = encodeURIComponent(config);
     if (config) {
         const isDesktop = !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         const button = document.getElementById('btn'); // Исправлено: берем правильный ID
 
         // Формируем нужную ссылку
-        const appLink = isDesktop ? "hiddify://import/" + config : "v2raytun://import/" + config;
+        const appLink = isDesktop ? "hiddify://import/" + safeConfig : "v2raytun://import/" + config;
         
         // Сразу привязываем ссылку к кнопке
         button.href = appLink;
@@ -58,7 +58,7 @@
             // Фоллбэк через 500мс
             setTimeout(() => { window.location.href = config; }, 500);
         };
-
+    
         // 1. Пытаемся запустить АВТОМАТИЧЕСКИ при загрузке
         launchApp();
 
