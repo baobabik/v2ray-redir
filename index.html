@@ -20,7 +20,6 @@
         
         .hint-container { display: none; flex-direction: column; align-items: center; }
         
-        /* Стили для большой ссылки-кнопки */
         .manual-link { 
             display: inline-block; margin-top: 15px; padding: 15px 25px; 
             background: #248bcf; color: white; text-decoration: none; 
@@ -34,37 +33,49 @@
     <div id="loading" class="loader"></div>
     
     <div id="hint" class="hint-container">
-        <div class="text-desc">Если приложение не открылось автоматически:</div>
-        <a id="btn" href="#" class="manual-link">ОТКРЫТЬ V2RAYTUN</a>
-        <p style="color: #666; font-size: 14px; margin-top: 20px;">Или скопируйте ссылку вручную из бота</p>
+        <div class="text-desc">Приложение не открылось?</div>
+        <a id="btn" href="#" class="manual-link">ОТКРЫТЬ ПРИЛОЖЕНИЕ</a>
+        <p style="color: #666; font-size: 14px; margin-top: 20px;">Нажмите кнопку выше для ручного запуска</p>
     </div>
+
     <script>
     const urlParams = new URLSearchParams(window.location.search);
     const config = urlParams.get('config');
 
     if (config) {
-         const isDesktop = !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-          
-        document.getElementById('mainBtn').onclick = function() {
-            if (isDesktop) {
-                // Ссылка для десктопных Hiddify / Happ
-                const desktopLink = "hiddify://import/" + config;
-                window.location.href = desktopLink;
-            } else {
-                // Ссылка для мобильного v2raytun
-                const mobileLink = "v2raytun://import/" + config;
-                window.location.href = mobileLink;
-            }
+        const isDesktop = !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const button = document.getElementById('btn'); // Исправлено: берем правильный ID
 
-            setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('hint').style.display = 'flex';
-            }, 2000);
-            
-            // Фоллбэк: пробуем открыть чистый vless через 1 сек
-            setTimeout(() => { window.location.href = config; }, 1000);
-            };
-        }
+        // Формируем нужную ссылку
+        const appLink = isDesktop ? "hiddify://import/" + config : "v2raytun://import/" + config;
+        
+        // Сразу привязываем ссылку к кнопке
+        button.href = appLink;
+
+        // ФУНКЦИЯ ЗАПУСКА
+        const launchApp = () => {
+            window.location.href = appLink;
+            // Фоллбэк через 500мс
+            setTimeout(() => { window.location.href = config; }, 500);
+        };
+
+        // 1. Пытаемся запустить АВТОМАТИЧЕСКИ при загрузке
+        launchApp();
+
+        // 2. Если пользователь нажмет кнопку вручную
+        button.onclick = (e) => {
+            launchApp();
+        };
+
+        // 3. Показываем кнопку-подсказку через 2.5 секунды, если авто-запуск не сработал
+        setTimeout(() => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('hint').style.display = 'flex';
+        }, 2500);
+
+    } else {
+        document.body.innerHTML = "Ошибка: Конфиг не найден в ссылке.";
+    }
     </script>
 </body>
 </html>
